@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import createErrors from "http-errors";
+import postsRoutes from "./api/routes/postsRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -11,17 +13,19 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 app.use(cors());
 app.use(morgan("dev"));
 
-app.use((req, res, next) => {
-  const error = new Error("Not Found");
-  error.status = 404;
-  next(error);
+app.use("/posts", postsRoutes);
+app.use(async (req, res, next) => {
+  //   const error = new Error("Not Found");
+  //   error.status = 404;
+  //   next(error);
+  next(createErrors.NotFound("This route does not exist"));
 });
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
   res.json({
     error: {
-      message: error.message,
+      message: error,
       status: error.status || 500,
     },
   });
@@ -40,8 +44,9 @@ mongoose
   .catch((error) => {
     console.log(error);
     console.log("Backend failed isn't running.....");
+    process.exit(1);
   });
 
-mongoose.connection.on(() => {
-  console.log("Backend is running very successfully");
+mongoose.connection.on("connection", () => {
+  console.log("Mongoose connection to db is very successfully");
 });

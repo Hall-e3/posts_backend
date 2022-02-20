@@ -1,0 +1,11 @@
+## getting all posts
+POST  http://localhost:5000/posts
+Content-Type: application/json
+
+{
+    "title":"Music",
+    "message":"It's my best",
+    "creator":"Ken"
+}
+
+
